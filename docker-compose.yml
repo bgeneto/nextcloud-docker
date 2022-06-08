@@ -34,7 +34,7 @@ volumes:
 
 services:
 
-  notify_push:
+  nextcloud_notify_push:
     build: ./notify_push
     container_name: nextcloud-notify-push
     hostname: push
@@ -42,7 +42,7 @@ services:
     volumes:
       - nextcloud_data:/var/www/html:ro
 
-  app:
+  nextcloud_app:
     image: nextcloud:stable-fpm
     container_name: nextcloud-app
     hostname: app
@@ -77,7 +77,7 @@ services:
         constraints:
           - node.role==manager
 
-  web:
+  nextcloud_web:
     image: clearlinux/nginx
     #build: ./nginx
     container_name: nextcloud-web
@@ -104,10 +104,10 @@ services:
         constraints:
           - node.role==manager
 
-  db:
+  nextcloud_db:
     image: clearlinux/mariadb
     command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --skip-innodb-read-only-compressed --disable-log-bin
-    container_name: mariadb
+    container_name: nextcloud-db
     hostname: ${MYSQL_HOST}
     restart: always
     volumes:
@@ -123,9 +123,9 @@ services:
       - PGID=${PGID}
       - TZ=${TZ}
 
-  redis:
+  nextcloud_redis:
     image: clearlinux/redis
     hostname: ${REDIS_HOST}
-    container_name: redis
+    container_name: nextcloud-redis
     restart: always
 
