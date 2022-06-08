@@ -43,7 +43,7 @@ services:
       - nextcloud_data:/var/www/html:ro
 
   nextcloud_app:
-    image: nextcloud:fpm-opt
+    image: nextcloud:fpm
     container_name: nextcloud-app
     hostname: app
     restart: always

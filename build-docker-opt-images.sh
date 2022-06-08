@@ -29,6 +29,13 @@ export CPPFLAGS=${CFLAGS}
 export CXXFLAGS=${CFLAGS}
 export MAKEOPTS="-j$(nproc)"
 
+# create .env file from template
+if [ ! -e ".env" ]; then
+    echo "Renaming .env file..."
+    mv .env.tmp .env
+    echo "DIR=${DIR}" >> .env
+fi
+
 echo "Creating required folders..."
 if [ ! -d "$NCDATA" ]; then
     echo "Creating data storage directory..."
@@ -66,6 +73,12 @@ fi
 echo "Changing $VOL data directory ownership..."
 sudo chown -R $DBID:$DBID "$DIR/data/$VOL"
 
+# check if we want to use an optimized image 
+source .env 
+if [ $USE_OPT_IMG -eq 0 ]; then
+    exit 0
+fi;
+
 # php docker files to download
 declare -a files=("Dockerfile"
                   "docker-php-entrypoint"
@@ -101,7 +114,7 @@ git clone --depth 1 --filter=blob:none --sparse \
 git sparse-checkout set ${NC}/fpm
 sed -i "s/^FROM php:$PHP-fpm.*$/FROM php:${TAG}/g" "$DIR/build/nextcloud-fpm/${NC}/fpm/Dockerfile"
 # build nextcloud opt image 
-docker build --rm -t nextcloud:fpm-opt $DIR/build/nextcloud-fpm/${NC}/fpm
+docker build --rm -t nextcloud:fpm $DIR/build/nextcloud-fpm/${NC}/fpm
 docker images | grep opt
 
 echo "Starting up all containers..."
