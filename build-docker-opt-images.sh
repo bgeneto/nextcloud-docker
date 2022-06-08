@@ -6,13 +6,18 @@
 
 DIR=$(pwd)
 
+# create .env file from template and source it 
+if [ ! -e ".env" ]; then
+    echo "Renaming .env file..."
+    mv .env.tmp .env
+    echo "DIR=${DIR}" >> .env
+fi
+source .env 
+
 # http and db uid/gid 
 DBID=27
-NCID=80
 
 # software versions
-PHP="8.0"
-NC=23
 
 # php-fpm github repo
 URL="https://raw.githubusercontent.com/docker-library/php/master/${PHP}/bullseye/fpm"
@@ -29,18 +34,20 @@ export CPPFLAGS=${CFLAGS}
 export CXXFLAGS=${CFLAGS}
 export MAKEOPTS="-j$(nproc)"
 
-# create .env file from template
-if [ ! -e ".env" ]; then
-    echo "Renaming .env file..."
-    mv .env.tmp .env
-    echo "DIR=${DIR}" >> .env
-fi
+function start_containers {
+    echo "Starting up all containers..."
+    cd ${DIR}
+    docker compose up -d --remove-orphans
+    sudo chmod -R g=u "$DIR/data/nextcloud"
+    sudo chmod -R g=u "$NCDATA"
+}
 
 echo "Creating required folders..."
 if [ ! -d "$NCDATA" ]; then
     echo "Creating data storage directory..."
     sudo mkdir -p "$NCDATA"
-    sudo chown -R $NCID:$NCID "$NCDATA"
+    sudo chown -R 33:80 "$NCDATA"
+    sudo chmod -R g=u "$NCDATA"
 fi
 
 VOL=nextcloud
@@ -56,7 +63,8 @@ if [ ! -d "$DIR/data/$VOL" ]; then
     mkdir -p "$DIR/data/$VOL"
 fi
 echo "Changing $VOL data directory ownership..."
-sudo chown -R $NCID:$NCID "$DIR/data/$VOL"
+sudo chown -R 33:80 "$DIR/data/$VOL"
+sudo chmod -R g=u "$DIR/data/$VOL"
 
 VOL=mariadb
 if [ ! -d "$DIR/config/$VOL" ]; then
@@ -74,8 +82,8 @@ echo "Changing $VOL data directory ownership..."
 sudo chown -R $DBID:$DBID "$DIR/data/$VOL"
 
 # check if we want to use an optimized image 
-source .env 
 if [ $USE_OPT_IMG -eq 0 ]; then
+    start_containers
     exit 0
 fi;
 
@@ -116,8 +124,4 @@ sed -i "s/^FROM php:$PHP-fpm.*$/FROM php:${TAG}/g" "$DIR/build/nextcloud-fpm/${N
 # build nextcloud opt image 
 docker build --rm -t nextcloud:fpm $DIR/build/nextcloud-fpm/${NC}/fpm
 docker images | grep opt
-
-echo "Starting up all containers..."
-cd ${DIR}
-docker compose up -d --remove-orphans
-
+start_containers
