@@ -5,19 +5,37 @@
 #       Clearlinux mariadb user id is 27
 
 DIR=$(pwd)
+
+# http and db uid/gid 
 DBID=27
 NCID=80
+
+# software versions
 PHP="8.0"
-URL="https://raw.githubusercontent.com/docker-library/php/master/${PHP}/bullseye/fpm"
-TAG="${PHP}-fpm-bullseye-opt"
 NC=23
 
+# php-fpm github repo
+URL="https://raw.githubusercontent.com/docker-library/php/master/${PHP}/bullseye/fpm"
+
+# opt image tag 
+TAG="${PHP}-fpm-bullseye-opt"
+
+# storage (nextcloud files) folder 
+NCDATA="/mnt/storage"
+
+# default optimizations flags
 export CFLAGS="-O3 -march=native"
 export CPPFLAGS=${CFLAGS}
 export CXXFLAGS=${CFLAGS}
 export MAKEOPTS="-j$(nproc)"
 
 echo "Creating required folders..."
+if [ ! -d "$NCDATA" ]; then
+    echo "Creating data storage directory..."
+    sudo mkdir -p "$NCDATA"
+    sudo chown -R $NCID:$NCID "$NCDATA"
+fi
+
 VOL=nextcloud
 if [ ! -d "$DIR/config/$VOL" ]; then
     echo "Creating $VOL config volume/directory..."

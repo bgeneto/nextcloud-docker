@@ -43,7 +43,7 @@ services:
       - nextcloud_data:/var/www/html:ro
 
   nextcloud_app:
-    image: nextcloud:stable-fpm
+    image: nextcloud:fpm-opt
     container_name: nextcloud-app
     hostname: app
     restart: always
@@ -86,7 +86,7 @@ services:
     depends_on:
       - app
     ports:
-      - 80:80
+      - ${NC_PORT}:80
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - nextcloud_data:/var/www/html
