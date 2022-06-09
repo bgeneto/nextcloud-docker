@@ -128,4 +128,28 @@ services:
     hostname: ${REDIS_HOST}
     container_name: nextcloud-redis
     restart: always
+    
+  nextcloud_imaginary:
+    image: h2non/imaginary:latest
+    container_name: imaginary
+    hostname: imaginary
+    restart: always
+    volumes:
+      - ./images:/mnt/data
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+       PORT: 9009
+       DEBUG: imaginary
+    command: -enable-placeholder -enable-url-source -mount /mnt/data
+    ports:
+      - "9009:9009"
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 5
+        window: 20s
+      placement:
+        constraints:
+          - node.role==manager
 
