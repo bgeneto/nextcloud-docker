@@ -140,7 +140,7 @@ services:
     environment:
        PORT: 9009
        VIPS_CONCURRENCY: 8
-    command: -enable-placeholder -enable-url-source -concurrency=8
+    command: -enable-placeholder -enable-url-source -concurrency 8 -cpus 8 -max-allowed-size 20971520
     deploy:
       restart_policy:
         condition: on-failure
