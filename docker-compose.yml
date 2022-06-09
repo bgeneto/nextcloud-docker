@@ -142,8 +142,6 @@ services:
        PORT: 9009
        DEBUG: imaginary
     command: -enable-placeholder -enable-url-source -mount /mnt/data
-    ports:
-      - "9009:9009"
     deploy:
       restart_policy:
         condition: on-failure
