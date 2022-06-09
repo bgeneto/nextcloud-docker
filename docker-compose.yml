@@ -135,13 +135,12 @@ services:
     hostname: imaginary
     restart: always
     volumes:
-      - ./images:/mnt/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
        PORT: 9009
-       DEBUG: imaginary
-    command: -enable-placeholder -enable-url-source -mount /mnt/data
+       VIPS_CONCURRENCY: 8
+    command: -enable-placeholder -enable-url-source -concurrency=8
     deploy:
       restart_policy:
         condition: on-failure
