@@ -8,7 +8,9 @@ So before using the `start.sh` script issue the following:
 
 
 ```bash
-sudo mount -t tmpfs -o size=2g tmpfs /mnt/tmp
+sudo mkdir /mnt/storage
 sudo mount -t tmpfs -o size=4G tmpfs /mnt/storage
+sudo mv .env.tmp .env
+sudo ./start.sh
 ```
 
