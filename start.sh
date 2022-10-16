@@ -6,6 +6,10 @@
 
 DIR=$(pwd)
 
+if [ -f "$DIR/.env.tmp" ]; then
+    echo -e "DIR=$DIR" | tee -a "$DIR/.env.tmp"
+fi
+
 VOL=nextcloud
 
 if [ ! -d "$DIR/config/$VOL" ]; then
