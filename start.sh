@@ -7,7 +7,9 @@
 DIR=$(pwd)
 
 if [ -f "$DIR/.env.tmp" ]; then
-    echo -e "DIR=$DIR" | tee -a "$DIR/.env.tmp"
+    grep -qxF "DIR=$DIR" "$DIR/.env.tmp" || echo "DIR=$DIR" >> "$DIR/.env.tmp"
+else
+    grep -qxF "DIR=$DIR" "$DIR/.env" || echo "DIR=$DIR" >> "$DIR/.env"
 fi
 
 VOL=nextcloud
